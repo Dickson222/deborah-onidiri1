@@ -1032,16 +1032,22 @@ export default function App() {
     document.head.appendChild(link);
   }, []);
 
+  // ── Read URL on first load — so /admin opens admin page directly ──
+  useEffect(() => {
+    if (window.location.pathname === "/admin" || window.location.pathname === "/admin/") {
+      setPage("admin");
+    }
+  }, []);
+
   useEffect(() => { window.scrollTo(0, 0); }, [page]);
 
   const nav = (p) => {
     setPage(p);
     setMenuOpen(false);
-    // Update URL for admin page so /admin works as a direct link
     if (p === "admin") {
-      window.history.pushState({}, "", "/admin");
-    } else if (window.location.pathname === "/admin") {
-      window.history.pushState({}, "", "/");
+      window.history.replaceState({}, "", "/admin");
+    } else {
+      window.history.replaceState({}, "", "/");
     }
   };
   const upd = (f, v) => setForm(prev => ({ ...prev, [f]: v }));
