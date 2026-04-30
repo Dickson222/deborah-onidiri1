@@ -1010,7 +1010,9 @@ const ConfirmationPage = ({ nav, currentBooking, downloadTicket, downloading, re
 export default function App() {
   const [page, setPage] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("do_bookings") || "[]"); } catch { return []; }
+  });
   const [currentBooking, setCurrentBooking] = useState(null);
   const [adminAuthed, setAdminAuthed] = useState(() => sessionStorage.getItem("do_admin") === "1");
   const [downloading, setDownloading] = useState(false);
@@ -1068,7 +1070,11 @@ export default function App() {
   const submitBooking = async () => {
     if (!validate()) return;
     const booking = { ...form, id: generateBookingId(), createdAt: new Date().toISOString() };
-    setBookings(prev => [booking, ...prev]);
+    setBookings(prev => {
+      const updated = [booking, ...prev];
+      try { localStorage.setItem("do_bookings", JSON.stringify(updated)); } catch {}
+      return updated;
+    });
     setCurrentBooking(booking);
     nav("confirmation");
     // Fire & forget email notification
